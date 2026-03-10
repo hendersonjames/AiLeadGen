@@ -1,0 +1,7 @@
+{
+  "name": "Home Services Lead Hub",
+  "description": "An AI-powered application to generate, qualify, and manage leads for home services businesses using Google's Gemini API.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

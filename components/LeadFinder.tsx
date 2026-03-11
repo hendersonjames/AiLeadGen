@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { findLeads } from '../services/geminiService';
 import { useGeolocation } from '../hooks/useGeolocation';
 import LoadingSpinner from './common/LoadingSpinner';
+import LeadSaveButton from './LeadSaveButton';
 import { LocationMarkerIcon, SearchIcon, MapIcon } from './common/Icons';
 import type { GroundingChunk } from '../types';
 
 declare const marked: any;
 
 const LeadFinder: React.FC = () => {
-  const [serviceType, setServiceType] = useState('plumber');
-  const [location, setLocation] = useState('San Francisco, CA');
+  const [serviceType, setServiceType] = useState('roofer');
+  const [location, setLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{ text: string; sources: GroundingChunk[] } | null>(null);
@@ -43,6 +44,12 @@ const LeadFinder: React.FC = () => {
     }
   };
 
+  // Parse city/state from location string
+  const parseLocation = (loc: string) => {
+    const parts = loc.split(',').map(p => p.trim());
+    return { city: parts[0] || loc, state: parts[1] || '' };
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-1 text-white">Find Local Leads</h2>
@@ -57,7 +64,7 @@ const LeadFinder: React.FC = () => {
               id="serviceType"
               value={serviceType}
               onChange={(e) => setServiceType(e.target.value)}
-              placeholder="e.g., plumber, electrician, roofer"
+              placeholder="e.g., roofer, plumber, HVAC"
               className="w-full bg-base-300 border border-base-300 text-content-100 rounded-lg p-3 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
             />
           </div>
@@ -69,7 +76,7 @@ const LeadFinder: React.FC = () => {
                 id="location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g., San Francisco, CA"
+                placeholder="e.g., Denver, CO"
                 className="w-full bg-base-300 border border-base-300 text-content-100 rounded-lg p-3 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
               />
               <button
@@ -82,8 +89,8 @@ const LeadFinder: React.FC = () => {
                 {geoLoading ? <LoadingSpinner size="w-5 h-5" /> : <LocationMarkerIcon className="w-5 h-5" />}
               </button>
             </div>
-             {geoError && <p className="text-red-400 text-xs mt-1">Could not get location: {geoError.message}</p>}
-             {geoData && <p className="text-green-400 text-xs mt-1">Using your current location.</p>}
+            {geoError && <p className="text-red-400 text-xs mt-1">Could not get location: {geoError.message}</p>}
+            {geoData && <p className="text-green-400 text-xs mt-1">Using your current location.</p>}
           </div>
         </div>
         <button
@@ -99,15 +106,32 @@ const LeadFinder: React.FC = () => {
 
       {result && (
         <div className="mt-8">
-          <h3 className="text-xl font-bold mb-4 text-white">Generated Leads</h3>
-          <div className="prose prose-invert prose-p:text-content-100 prose-headings:text-white bg-base-100 p-4 rounded-lg" dangerouslySetInnerHTML={{ __html: marked.parse(result.text) }}></div>
-          
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-white">Generated Leads</h3>
+            <LeadSaveButton
+              leadData={{
+                name: `${serviceType} leads — ${location}`,
+                service_type: serviceType,
+                ...parseLocation(location),
+                source: 'lead_finder',
+                raw_lead_text: result.text,
+                notes: `Found via Lead Finder on ${new Date().toLocaleDateString()}`,
+              }}
+            />
+          </div>
+          <div
+            className="prose prose-invert prose-p:text-content-100 prose-headings:text-white bg-base-100 p-4 rounded-lg"
+            dangerouslySetInnerHTML={{ __html: marked.parse(result.text) }}
+          />
+
           {result.sources && result.sources.length > 0 && (
             <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-2 flex items-center gap-2 text-white"><MapIcon className="w-5 h-5 text-brand-secondary"/> Data Sources</h4>
+              <h4 className="text-lg font-semibold mb-2 flex items-center gap-2 text-white">
+                <MapIcon className="w-5 h-5 text-brand-secondary" /> Data Sources
+              </h4>
               <ul className="space-y-2">
                 {result.sources.map((source, index) => (
-                  (source.maps && 
+                  source.maps && (
                     <li key={index} className="bg-base-100 p-3 rounded-lg">
                       <a href={source.maps.uri} target="_blank" rel="noopener noreferrer" className="text-brand-secondary hover:underline font-medium">
                         {source.maps.title || 'View on Google Maps'}

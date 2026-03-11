@@ -1,6 +1,7 @@
 export enum Tab {
   LEAD_FINDER = 'lead-finder',
   LEAD_QUALIFIER = 'lead-qualifier',
+  PIPELINE = 'pipeline',
   MARKETING_COPY = 'marketing-copy',
   BUSINESS_PLANNER = 'business-planner',
   CHAT = 'chat',
@@ -13,12 +14,6 @@ export interface ChatMessage {
 }
 
 export interface GroundingChunk {
-  web?: {
-    uri: string;
-    title: string;
-  };
-  maps?: {
-    uri: string;
-    title: string;
-  };
+  web?: { uri: string; title: string; };
+  maps?: { uri: string; title: string; };
 }

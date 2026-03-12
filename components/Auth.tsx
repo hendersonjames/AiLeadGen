@@ -3,8 +3,30 @@
 
 import React, { useState } from 'react';
 import { signIn, signUp, signInWithGoogle } from '../services/authService';
+import { supabaseConfigured } from '../lib/supabase';
 
 const Auth: React.FC = () => {
+  if (!supabaseConfigured) {
+    return (
+      <div className="min-h-screen bg-base-200 flex items-center justify-center p-4">
+        <div className="bg-base-100 rounded-xl p-8 max-w-md w-full border border-red-500/30 text-center">
+          <div className="text-4xl mb-4">⚙️</div>
+          <h2 className="text-xl font-bold text-white mb-2">Configuration Required</h2>
+          <p className="text-content-200 text-sm mb-4">
+            Supabase environment variables are missing. Please add the following to your Vercel project settings:
+          </p>
+          <div className="bg-base-300 rounded-lg p-4 text-left text-xs font-mono text-content-100 space-y-1">
+            <div>VITE_SUPABASE_URL</div>
+            <div>VITE_SUPABASE_PUBLISHABLE_KEY</div>
+            <div>GEMINI_API_KEY</div>
+          </div>
+          <p className="text-content-200 text-xs mt-4">After adding them, redeploy the app.</p>
+        </div>
+      </div>
+    );
+  }
+
+
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -8,26 +8,45 @@ if (!process.env.API_KEY) {
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 let chatInstance: Chat | null = null;
 
+// HOMEOWNER LEAD FINDER — finds potential customers for a contractor (not other contractors)
 export const findLeads = async (serviceType: string, location: string, userCoords?: { latitude: number; longitude: number }): Promise<GenerateContentResponse> => {
-  const prompt = `Find ${serviceType} businesses near ${location}. Provide a brief summary for each.`;
-  
-  const config = userCoords 
-    ? {
-        tools: [{ googleMaps: {} }],
-        toolConfig: {
-            retrievalConfig: {
-                latLng: userCoords
-            }
-        }
-      }
-    : {
-        tools: [{ googleMaps: {} }],
-      };
+  const prompt = `You are a lead generation expert helping a ${serviceType} contractor find new residential and commercial customers in ${location}.
+
+Your goal is to find HOMEOWNERS and BUSINESSES that likely need ${serviceType} services — NOT other contractors.
+
+Search for the following signals in the ${location} area:
+1. **Recent storm, hail, wind, or weather damage** — news reports, community alerts, insurance claims spikes
+2. **Neighborhoods with aging housing stock** — homes 15–30+ years old that likely need ${serviceType} work
+3. **Recent real estate activity** — newly sold or newly listed homes (new owners often need inspections/work)
+4. **Local permit activity** — renovation or construction permits that commonly pair with ${serviceType}
+5. **Community discussions** — local Facebook groups, Nextdoor posts, or forums where residents mention needing ${serviceType}
+6. **Commercial properties** — businesses, apartment complexes, or HOAs that may need ${serviceType} services
+
+For each opportunity found, provide:
+- **Area/Neighborhood** — specific location
+- **Opportunity Type** — what signal was found (storm damage, new homeowner, etc.)
+- **Why It's a Lead** — brief explanation
+- **Urgency** — High / Medium / Low
+- **Suggested First Step** — how the contractor should approach this lead
+
+Format as a clear, actionable list. Focus on real, specific opportunities in ${location} — not generic advice.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
-    config: config,
+    config: { tools: [{ googleSearch: {} }] },
+  });
+  return response;
+};
+
+// CONTRACTOR FINDER — for admin use only, finds contractors to sell LeadHub to
+export const findContractors = async (serviceType: string, location: string): Promise<GenerateContentResponse> => {
+  const prompt = `Find ${serviceType} businesses near ${location}. For each, provide their business name, address, phone number if available, approximate size (solo, small team, or large company), and any signals that suggest they might need better lead generation tools (e.g., limited web presence, no reviews, or heavy reliance on Angi/HomeAdvisor). Format as a clear list.`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+    config: { tools: [{ googleSearch: {} }] },
   });
   return response;
 };

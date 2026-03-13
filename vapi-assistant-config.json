@@ -1,0 +1,66 @@
+{
+  "name": "LeadHub AI Receptionist",
+  "voice": {
+    "provider": "11labs",
+    "voiceId": "rachel",
+    "stability": 0.5,
+    "similarityBoost": 0.75
+  },
+  "model": {
+    "provider": "google",
+    "model": "gemini-2.0-flash",
+    "temperature": 0.7,
+    "systemPrompt": "You are a professional phone receptionist named {{ASSISTANT_NAME}} for {{BUSINESS_NAME}}, a {{SERVICE_TYPE}} company serving {{SERVICE_AREA}}.\n\nYour job is to:\n1. Greet the caller warmly using the business name\n2. Find out what they need\n3. Gather their contact info and details about the job\n4. Let them know the team will be in touch shortly\n5. Be professional, friendly, and concise\n\nIMPORTANT RULES:\n- Never make up pricing or availability\n- Never promise specific appointment times unless given a calendar\n- Always collect: caller's name, callback number, address/location, and description of the issue\n- If it sounds like an emergency (active leak, no heat in winter, storm damage), flag it as urgent\n- Keep calls under 3 minutes when possible\n- End by saying someone from the team will follow up within [RESPONSE_TIME]\n\nQUALIFYING QUESTIONS for roofing:\n- How old is your roof?\n- What's the issue — leak, damage, full replacement?\n- Did something specific cause it (storm, age, accident)?\n- Is this for a residential home or commercial property?\n- What's the address?\n\nFor other trades, ask what the specific issue is, how urgent it is, and the property address.",
+    "functions": [
+      {
+        "name": "end_call",
+        "description": "End the call after gathering all necessary information",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "caller_name": {
+              "type": "string",
+              "description": "Full name of the caller"
+            },
+            "callback_number": {
+              "type": "string",
+              "description": "Phone number to call back"
+            },
+            "address": {
+              "type": "string",
+              "description": "Property address"
+            },
+            "service_needed": {
+              "type": "string",
+              "description": "Type of service they need"
+            },
+            "issue_description": {
+              "type": "string",
+              "description": "Brief description of the problem"
+            },
+            "urgency": {
+              "type": "string",
+              "enum": ["emergency", "high", "medium", "low"],
+              "description": "How urgent is the request"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "firstMessage": "Thank you for calling {{BUSINESS_NAME}}, this is {{ASSISTANT_NAME}}. How can I help you today?",
+  "endCallMessage": "Great, I've got all your information. Someone from our team will be in touch with you shortly. Have a great day!",
+  "endCallPhrases": [
+    "goodbye",
+    "bye",
+    "thank you bye",
+    "have a good day",
+    "talk to you later"
+  ],
+  "recordingEnabled": true,
+  "silenceTimeoutSeconds": 30,
+  "maxDurationSeconds": 600,
+  "backgroundSound": "office",
+  "serverUrl": "{{WEBHOOK_URL}}/api/vapi-webhook",
+  "serverUrlSecret": "{{WEBHOOK_SECRET}}"
+}

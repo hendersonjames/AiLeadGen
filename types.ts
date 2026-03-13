@@ -2,6 +2,7 @@ export enum Tab {
   LEAD_FINDER = 'lead-finder',
   LEAD_QUALIFIER = 'lead-qualifier',
   PIPELINE = 'pipeline',
+  CALLS = 'calls',
   MARKETING_COPY = 'marketing-copy',
   BUSINESS_PLANNER = 'business-planner',
   CHAT = 'chat',

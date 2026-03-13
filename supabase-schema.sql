@@ -172,3 +172,38 @@ create trigger on_auth_user_created
 -- ================================================================
 -- DONE! Your LeadHub database is ready.
 -- ================================================================
+
+-- ================================================================
+-- CALLS TABLE (Phase 4 — AI Phone Receptionist)
+-- Stores every inbound call handled by the Vapi AI agent
+-- ================================================================
+create table if not exists public.calls (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users(id) on delete cascade,
+  vapi_call_id text unique,
+  caller_phone text,
+  caller_name text,
+  address text,
+  service_needed text,
+  issue_description text,
+  urgency text default 'medium' check (urgency in ('emergency', 'high', 'medium', 'low')),
+  duration_seconds integer,
+  recording_url text,
+  transcript text,
+  status text default 'new' check (status in ('new', 'contacted', 'converted', 'lost')),
+  call_id uuid,
+  started_at timestamptz,
+  ended_at timestamptz,
+  created_at timestamptz default now() not null
+);
+
+alter table public.calls enable row level security;
+
+create policy "Users can view their own calls"
+  on public.calls for select using (auth.uid() = user_id);
+
+create policy "Service role can insert calls"
+  on public.calls for insert with check (true);
+
+-- Add call_id reference to leads table
+alter table public.leads add column if not exists call_id uuid references public.calls(id);

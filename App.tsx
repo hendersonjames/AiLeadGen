@@ -9,6 +9,7 @@ import BusinessPlanner from './components/BusinessPlanner';
 import ChatBot from './components/ChatBot';
 import BusinessNamer from './components/BusinessNamer';
 import Pipeline from './components/Pipeline';
+import Calls from './components/Calls';
 import Auth from './components/Auth';
 import { Tab } from './types';
 
@@ -30,6 +31,7 @@ const App: React.FC = () => {
     { id: Tab.LEAD_FINDER, label: 'Lead Finder' },
     { id: Tab.LEAD_QUALIFIER, label: 'Lead Qualifier' },
     { id: Tab.PIPELINE, label: 'Pipeline' },
+    { id: Tab.CALLS, label: '📞 Calls' },
     { id: Tab.BUSINESS_PLANNER, label: 'Strategy Planner' },
     { id: Tab.MARKETING_COPY, label: 'Marketing Copy' },
     { id: Tab.NAME_IDEAS, label: 'Name Ideas' },
@@ -41,6 +43,7 @@ const App: React.FC = () => {
       case Tab.LEAD_FINDER: return <LeadFinder />;
       case Tab.LEAD_QUALIFIER: return <LeadQualifier />;
       case Tab.PIPELINE: return <Pipeline />;
+      case Tab.CALLS: return <Calls />;
       case Tab.MARKETING_COPY: return <MarketingGenerator />;
       case Tab.BUSINESS_PLANNER: return <BusinessPlanner />;
       case Tab.CHAT: return <ChatBot />;

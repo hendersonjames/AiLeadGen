@@ -31,7 +31,7 @@ create table if not exists public.leads (
   notes text,
   
   -- Source tracking
-  source text default 'lead_finder', -- lead_finder, manual, referral
+  source text default 'lead_finder', -- lead_finder, manual, referral, phone_call
   source_url text, -- Google Maps URL if from lead finder
   raw_lead_text text, -- Original AI-generated lead info
   qualification_report text, -- AI qualification analysis
@@ -207,3 +207,33 @@ create policy "Service role can insert calls"
 
 -- Add call_id reference to leads table
 alter table public.leads add column if not exists call_id uuid references public.calls(id);
+
+-- ================================================================
+-- INDEXES (Performance)
+-- ================================================================
+create index if not exists idx_leads_user_id on public.leads(user_id);
+create index if not exists idx_leads_stage on public.leads(stage);
+create index if not exists idx_leads_created_at on public.leads(created_at desc);
+create index if not exists idx_lead_activities_lead_id on public.lead_activities(lead_id);
+create index if not exists idx_calls_vapi_call_id on public.calls(vapi_call_id);
+create index if not exists idx_calls_created_at on public.calls(created_at desc);
+
+-- ================================================================
+-- SCHEMA PATCH — Run this if upgrading from earlier schema versions
+-- Fixes needed before enabling Phase 4 (Vapi phone calls):
+-- 1. Make leads.user_id nullable so webhook can insert phone_call leads
+--    without a session user (service role bypasses RLS but NOT NULL constraint
+--    still applies). Leads can be claimed by a user later.
+-- 2. Calls RLS: add update policy for users to update call status
+-- ================================================================
+
+-- Patch 1: Make user_id nullable on leads for phone_call source
+-- WARNING: Only run this if you've verified your RLS policies still protect data.
+-- RLS select/update/delete policies already filter on auth.uid() = user_id,
+-- so NULL user_id rows are safe — they won't be visible to regular users
+-- (only service role can see/modify them, or you add a claim flow later).
+alter table public.leads alter column user_id drop not null;
+
+-- Patch 2: Add update policy for calls table so users can update status
+create policy if not exists "Users can update their own calls"
+  on public.calls for update using (auth.uid() = user_id);

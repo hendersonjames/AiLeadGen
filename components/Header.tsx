@@ -1,12 +1,19 @@
 import React from 'react';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  user?: { email?: string } | null;
+  onSignOut?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   return (
-    <header className="bg-base-200/50 backdrop-blur-sm sticky top-0 z-10 border-b border-base-300">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-center">
+    <header className="bg-base-200/60 backdrop-blur-sm sticky top-0 z-10 border-b border-base-300">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+
+        {/* Logo / Wordmark */}
         <div className="flex items-center space-x-3">
           {/* LeadHub Icon — house/location pin with gradient */}
-          <svg width="36" height="44" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="32" height="38" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="blueGrad" x1="50" y1="115" x2="50" y2="5" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stopColor="#1E40AF"/>
@@ -39,10 +46,27 @@ const Header: React.FC = () => {
             <polyline points="66,42 72,46 68,54" stroke="url(#arrowGrad)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
           {/* Wordmark */}
-          <h1 className="text-2xl font-black tracking-tight">
-            <span style={{background: 'linear-gradient(to right, #1E40AF, #06B6D4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Lead</span><span style={{color: '#F97316'}}>Hub</span>
+          <h1 className="text-xl font-black tracking-tight">
+            <span style={{background: 'linear-gradient(to right, #1E40AF, #06B6D4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Lead</span>
+            <span style={{color: '#F97316'}}>Hub</span>
           </h1>
         </div>
+
+        {/* Right side: user info + sign out */}
+        {user && onSignOut && (
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-content-200 hidden sm:block truncate max-w-[200px]" title={user.email}>
+              {user.email}
+            </span>
+            <button
+              onClick={onSignOut}
+              className="text-xs bg-base-300 hover:bg-base-100 text-content-200 hover:text-content-100 px-3 py-1.5 rounded-lg transition-colors border border-base-300 hover:border-base-200 whitespace-nowrap"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
+
       </div>
     </header>
   );

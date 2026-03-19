@@ -53,9 +53,13 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
 
 // Get/update user profile
 export const getUserProfile = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
   const { data, error } = await supabase
     .from('user_profiles')
     .select('*')
+    .eq('id', user.id)
     .single();
   if (error && error.code !== 'PGRST116') throw error;
   return data;
@@ -68,9 +72,13 @@ export const updateUserProfile = async (updates: {
   phone?: string;
   onboarding_completed?: boolean;
 }) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
   const { data, error } = await supabase
     .from('user_profiles')
     .update(updates)
+    .eq('id', user.id)  // BUG FIX: was missing — would have tried to update all profiles
     .select()
     .single();
   if (error) throw error;

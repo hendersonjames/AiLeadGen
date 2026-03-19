@@ -68,15 +68,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-base-100 text-content-100 font-sans">
-      <Header />
-      <div className="flex justify-end px-4 pt-2">
-        <button
-          onClick={signOut}
-          className="text-xs text-content-200 hover:text-content-100 transition-colors"
-        >
-          Sign out ({user.email})
-        </button>
-      </div>
+      <Header user={user} onSignOut={signOut} />
       <main className="container mx-auto px-4 py-4">
         <Tabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <div className="mt-8 bg-base-200 p-6 sm:p-8 rounded-xl shadow-2xl border border-base-300">

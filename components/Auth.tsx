@@ -26,7 +26,6 @@ const Auth: React.FC = () => {
     );
   }
 
-
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -67,20 +66,64 @@ const Auth: React.FC = () => {
     }
   };
 
+  const toggleMode = () => {
+    setIsSignUp(!isSignUp);
+    setError(null);
+    setMessage(null);
+  };
+
   return (
     <div className="min-h-screen bg-base-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-black text-brand-primary mb-2">LeadHub</h1>
-          <p className="text-content-200 text-sm">AI-powered lead generation for home services</p>
+          <div className="flex items-center justify-center gap-3 mb-3">
+            {/* LeadHub Icon */}
+            <svg width="36" height="44" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="authBlueGrad" x1="50" y1="115" x2="50" y2="5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#1E40AF"/>
+                  <stop offset="100%" stopColor="#06B6D4"/>
+                </linearGradient>
+                <linearGradient id="authOrangeGrad" x1="50" y1="115" x2="50" y2="5" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#EA580C"/>
+                  <stop offset="100%" stopColor="#FB923C"/>
+                </linearGradient>
+                <linearGradient id="authArrowGrad" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#06B6D4"/>
+                  <stop offset="100%" stopColor="#F97316"/>
+                </linearGradient>
+              </defs>
+              <polygon points="50,5 8,48 8,88 50,88" fill="url(#authBlueGrad)"/>
+              <polygon points="50,5 92,48 92,88 50,88" fill="url(#authOrangeGrad)"/>
+              <polygon points="8,88 92,88 50,115" fill="url(#authBlueGrad)"/>
+              <rect x="22" y="18" width="10" height="18" rx="1" fill="url(#authBlueGrad)"/>
+              <rect x="32" y="42" width="8" height="7" rx="1" fill="white" opacity="0.85"/>
+              <rect x="32" y="52" width="8" height="7" rx="1" fill="white" opacity="0.65"/>
+              <rect x="42" y="42" width="8" height="7" rx="1" fill="white" opacity="0.85"/>
+              <rect x="42" y="52" width="8" height="7" rx="1" fill="white" opacity="0.65"/>
+              <path d="M 14 82 Q 28 98 50 72 L 72 46" stroke="url(#authArrowGrad)" strokeWidth="5" strokeLinecap="round" fill="none"/>
+              <polyline points="66,42 72,46 68,54" stroke="url(#authArrowGrad)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            </svg>
+            <h1 className="text-4xl font-black tracking-tight">
+              <span style={{background: 'linear-gradient(to right, #1E40AF, #06B6D4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Lead</span>
+              <span style={{color: '#F97316'}}>Hub</span>
+            </h1>
+          </div>
+          <p className="text-content-200 text-sm">AI-powered lead generation for home service contractors</p>
         </div>
 
         {/* Card */}
         <div className="bg-base-200 rounded-2xl p-8 border border-base-300 shadow-2xl">
-          <h2 className="text-xl font-bold text-content-100 mb-6">
+          <h2 className="text-xl font-bold text-content-100 mb-1">
             {isSignUp ? 'Create your account' : 'Welcome back'}
           </h2>
+          <p className="text-content-200 text-sm mb-6">
+            {isSignUp
+              ? 'Start finding high-quality leads in minutes.'
+              : 'Sign in to access your lead dashboard.'}
+          </p>
 
           {error && (
             <div className="bg-red-900/30 border border-red-500 text-red-300 rounded-lg p-3 mb-4 text-sm">
@@ -95,14 +138,14 @@ const Auth: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-content-200 mb-1">Email</label>
+              <label className="block text-sm font-medium text-content-200 mb-1">Work Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
+                placeholder="you@yourcompany.com"
                 required
-                className="w-full bg-base-300 border border-base-300 text-content-100 rounded-lg p-3 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                className="w-full bg-base-300 border border-base-300 text-content-100 rounded-lg p-3 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none transition-all placeholder-content-200/50"
               />
             </div>
             <div>
@@ -114,28 +157,31 @@ const Auth: React.FC = () => {
                 placeholder="••••••••"
                 required
                 minLength={6}
-                className="w-full bg-base-300 border border-base-300 text-content-100 rounded-lg p-3 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary"
+                className="w-full bg-base-300 border border-base-300 text-content-100 rounded-lg p-3 focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none transition-all"
               />
+              {isSignUp && (
+                <p className="text-content-200 text-xs mt-1">Minimum 6 characters</p>
+              )}
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-brand-primary hover:bg-brand-primary/80 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50"
+              className="w-full bg-brand-primary hover:bg-blue-700 active:bg-blue-800 text-white font-bold py-3 rounded-lg transition-colors disabled:opacity-50 shadow-lg shadow-brand-primary/20 mt-2"
             >
-              {loading ? 'Please wait...' : isSignUp ? 'Create Account' : 'Sign In'}
+              {loading ? 'Please wait...' : isSignUp ? 'Create Free Account' : 'Sign In'}
             </button>
           </form>
 
-          <div className="flex items-center my-4">
+          <div className="flex items-center my-5">
             <div className="flex-1 border-t border-base-300" />
-            <span className="px-3 text-content-200 text-xs">OR</span>
+            <span className="px-3 text-content-200 text-xs uppercase tracking-wide">or continue with</span>
             <div className="flex-1 border-t border-base-300" />
           </div>
 
           <button
             onClick={handleGoogleSignIn}
             disabled={loading}
-            className="w-full bg-white text-gray-800 font-semibold py-3 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-100 transition-colors disabled:opacity-50"
+            className="w-full bg-white text-gray-800 font-semibold py-3 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-100 active:bg-gray-200 transition-colors disabled:opacity-50 shadow-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -145,17 +191,35 @@ const Auth: React.FC = () => {
             </svg>
             Continue with Google
           </button>
-
-          <p className="text-center text-sm text-content-200 mt-6">
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              onClick={() => { setIsSignUp(!isSignUp); setError(null); setMessage(null); }}
-              className="text-brand-primary hover:underline font-medium"
-            >
-              {isSignUp ? 'Sign in' : 'Sign up free'}
-            </button>
-          </p>
         </div>
+
+        {/* Prominent sign-up / sign-in toggle */}
+        <div className="mt-4">
+          <div className="bg-base-200 border border-base-300 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-content-100 font-semibold text-sm">
+                {isSignUp ? 'Already have an account?' : 'New to LeadHub?'}
+              </p>
+              <p className="text-content-200 text-xs mt-0.5">
+                {isSignUp
+                  ? 'Sign in to your existing account.'
+                  : 'Free forever. No credit card required.'}
+              </p>
+            </div>
+            <button
+              onClick={toggleMode}
+              className="shrink-0 px-4 py-2 text-sm font-semibold border border-brand-secondary text-brand-secondary rounded-lg hover:bg-brand-secondary hover:text-white transition-colors whitespace-nowrap"
+            >
+              {isSignUp ? '← Sign In' : 'Sign Up Free →'}
+            </button>
+          </div>
+        </div>
+
+        {/* Trust signal */}
+        <p className="text-center text-content-200/60 text-xs mt-5">
+          Trusted by home service contractors · Secured by Supabase
+        </p>
+
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import LeadDetail from './LeadDetail';
 const STAGES: { key: LeadStage; label: string; color: string }[] = [
   { key: 'new',           label: 'New',           color: 'bg-blue-500' },
   { key: 'contacted',     label: 'Contacted',     color: 'bg-yellow-500' },
-  { key: 'estimate_sent', label: 'Estimate Sent', color: 'bg-purple-500' },
+  { key: 'estimate_sent', label: 'Estimate Sent', color: 'bg-orange-500' },
   { key: 'won',           label: 'Won ✓',         color: 'bg-green-500' },
   { key: 'lost',          label: 'Lost',          color: 'bg-red-500' },
 ];

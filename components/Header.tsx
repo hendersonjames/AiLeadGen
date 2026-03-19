@@ -12,42 +12,25 @@ const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
 
         {/* Logo / Wordmark */}
         <div className="flex items-center space-x-3">
-          {/* LeadHub Icon — house/location pin with gradient */}
-          <svg width="32" height="38" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="blueGrad" x1="50" y1="115" x2="50" y2="5" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#1E40AF"/>
-                <stop offset="100%" stopColor="#06B6D4"/>
-              </linearGradient>
-              <linearGradient id="orangeGrad" x1="50" y1="115" x2="50" y2="5" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#EA580C"/>
-                <stop offset="100%" stopColor="#FB923C"/>
-              </linearGradient>
-              <linearGradient id="arrowGrad" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#06B6D4"/>
-                <stop offset="100%" stopColor="#F97316"/>
-              </linearGradient>
-            </defs>
-            {/* Left half - blue */}
-            <polygon points="50,5 8,48 8,88 50,88" fill="url(#blueGrad)"/>
-            {/* Right half - orange */}
-            <polygon points="50,5 92,48 92,88 50,88" fill="url(#orangeGrad)"/>
-            {/* Bottom point */}
-            <polygon points="8,88 92,88 50,115" fill="url(#blueGrad)"/>
-            {/* Chimney */}
-            <rect x="22" y="18" width="10" height="18" rx="1" fill="url(#blueGrad)"/>
-            {/* Window panes */}
-            <rect x="32" y="42" width="8" height="7" rx="1" fill="white" opacity="0.85"/>
-            <rect x="32" y="52" width="8" height="7" rx="1" fill="white" opacity="0.65"/>
-            <rect x="42" y="42" width="8" height="7" rx="1" fill="white" opacity="0.85"/>
-            <rect x="42" y="52" width="8" height="7" rx="1" fill="white" opacity="0.65"/>
-            {/* Swooping arrow */}
-            <path d="M 14 82 Q 28 98 50 72 L 72 46" stroke="url(#arrowGrad)" strokeWidth="5" strokeLinecap="round" fill="none"/>
-            <polyline points="66,42 72,46 68,54" stroke="url(#arrowGrad)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          {/* LeadHub Icon — isometric 3D house */}
+          <svg width="36" height="40" viewBox="0 0 90 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Left face — blue */}
+            <polygon points="45,8 8,30 8,78 45,56" fill="#3B82F6"/>
+            {/* Right face — orange */}
+            <polygon points="45,8 82,30 82,78 45,56" fill="#F97316"/>
+            {/* Bottom cap — dark blue */}
+            <polygon points="8,78 45,56 82,78 45,100" fill="#1D4ED8"/>
+            {/* Window on left face — 2x2 grid */}
+            <rect x="18" y="36" width="7" height="6" rx="0.5" fill="white" opacity="0.9"/>
+            <rect x="27" y="36" width="7" height="6" rx="0.5" fill="white" opacity="0.9"/>
+            <rect x="18" y="44" width="7" height="6" rx="0.5" fill="white" opacity="0.9"/>
+            <rect x="27" y="44" width="7" height="6" rx="0.5" fill="white" opacity="0.9"/>
+            {/* Cyan curve — starts bottom-left, arcs up and right into right face */}
+            <path d="M 12 72 Q 30 50 50 42 Q 65 36 76 30" stroke="#22D3EE" strokeWidth="3" strokeLinecap="round" fill="none"/>
           </svg>
           {/* Wordmark */}
           <h1 className="text-xl font-black tracking-tight">
-            <span style={{background: 'linear-gradient(to right, #1E40AF, #06B6D4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Lead</span>
+            <span style={{color: '#3B82F6'}}>Lead</span>
             <span style={{color: '#F97316'}}>Hub</span>
           </h1>
         </div>

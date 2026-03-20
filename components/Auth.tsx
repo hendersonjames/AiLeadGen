@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { signIn, signUp, signInWithGoogle } from '../services/authService';
 import { supabaseConfigured } from '../lib/supabase';
-import { LeadHubIcon } from './Header';
+import { LeadHubIcon, LeadHubLogo } from './Header';
 
 const Auth: React.FC = () => {
   if (!supabaseConfigured) {
@@ -73,13 +73,7 @@ const Auth: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Logo / Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <LeadHubIcon width={48} height={58} />
-            <h1 className="text-4xl font-black tracking-tight">
-              <span style={{color: '#2e86c1'}}>Lead</span><span style={{color: '#f39c12'}}>Hub</span>
-            </h1>
-          </div>
-          <p className="text-content-200 text-sm">AI-powered lead generation for home services</p>
+          <LeadHubLogo />
         </div>
 
         {/* Card */}

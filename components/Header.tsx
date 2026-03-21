@@ -1,4 +1,5 @@
 import React from 'react';
+import type { User } from '../lib/supabase';
 
 // LeadHub logo mark — house/location-pin with cyan-blue left, orange right, arrow, tagline
 const LeadHubIcon: React.FC<{ width?: number; height?: number }> = ({ width = 40, height = 48 }) => (
@@ -46,10 +47,16 @@ const LeadHubLogo: React.FC = () => (
   </div>
 );
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  user?: User | null;
+  onSignOut?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ user, onSignOut }) => {
   return (
     <header className="bg-base-200/50 backdrop-blur-sm sticky top-0 z-10 border-b border-base-300">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-center">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo + wordmark */}
         <div className="flex items-center space-x-3">
           <LeadHubIcon width={36} height={44} />
           <h1 className="text-2xl font-black tracking-tight" style={{fontFamily: 'Montserrat, Inter, sans-serif'}}>
@@ -57,6 +64,23 @@ const Header: React.FC = () => {
             <span style={{background: 'linear-gradient(to bottom, #f7941d, #d9531e)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'}}>Hub</span>
           </h1>
         </div>
+
+        {/* User info + sign out */}
+        {user && (
+          <div className="flex items-center gap-3">
+            <span className="text-content-200 text-xs hidden sm:block truncate max-w-[180px]">
+              {user.email}
+            </span>
+            {onSignOut && (
+              <button
+                onClick={onSignOut}
+                className="text-xs text-content-200 hover:text-content-100 bg-base-300 hover:bg-base-200 px-3 py-1.5 rounded-lg transition-colors border border-base-300 hover:border-content-200"
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

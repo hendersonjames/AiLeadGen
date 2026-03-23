@@ -38,6 +38,20 @@ export const signOut = async () => {
   if (error) throw error;
 };
 
+// Send password reset email
+export const resetPassword = async (email: string) => {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin,
+  });
+  if (error) throw error;
+};
+
+// Update password (used after clicking the reset link — user is in PASSWORD_RECOVERY session)
+export const updatePassword = async (newPassword: string) => {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw error;
+};
+
 // Get current user
 export const getCurrentUser = async (): Promise<User | null> => {
   const { data: { user } } = await supabase.auth.getUser();

@@ -217,6 +217,7 @@ create index if not exists idx_leads_created_at on public.leads(created_at desc)
 create index if not exists idx_lead_activities_lead_id on public.lead_activities(lead_id);
 create index if not exists idx_calls_vapi_call_id on public.calls(vapi_call_id);
 create index if not exists idx_calls_created_at on public.calls(created_at desc);
+create index if not exists idx_calls_user_id on public.calls(user_id);
 
 -- ================================================================
 -- SCHEMA PATCH — Run this if upgrading from earlier schema versions

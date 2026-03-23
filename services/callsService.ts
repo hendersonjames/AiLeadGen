@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 
 export interface Call {
   id: string;
+  user_id?: string;
   vapi_call_id?: string;
   caller_phone?: string;
   caller_name?: string;
@@ -16,7 +17,9 @@ export interface Call {
   recording_url?: string;
   transcript?: string;
   status: 'new' | 'contacted' | 'converted' | 'lost';
+  call_id?: string;      // UUID ref to leads.call_id (if a lead was created from this call)
   started_at?: string;
+  ended_at?: string;
   created_at: string;
 }
 

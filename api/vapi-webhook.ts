@@ -100,23 +100,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 2. Auto-create lead from call
     // NOTE: user_id is intentionally omitted — leads from phone calls are
     // inserted via the service role (bypasses RLS). The leads.user_id column
-    // must be made nullable in the schema for this to work (see supabase-schema.sql).
-    // James: run the schema patch below before enabling Vapi.
+    // must be made nullable in the schema for this to work.
+    // James: run this in Supabase SQL Editor BEFORE enabling Vapi:
+    //   alter table public.leads alter column user_id drop not null;
     if (structured?.caller_name || structured?.address) {
-      await supabase.from('leads').insert({
-        // user_id omitted — phone_call leads are ownerless until claimed or
-        // the webhook is updated to accept a Vapi assistant metadata user_id.
-        name: structured?.caller_name || 'Phone Inquiry',
-        phone: structured?.callback_number || call?.customer?.number,
-        address: structured?.address,
-        service_type: structured?.service_needed || 'roofing',
-        source: 'phone_call',
-        raw_lead_text: transcript,
-        notes: structured?.issue_description,
-        urgency: urgencyToScore(structured?.urgency),
-        stage: 'new',
-        call_id: callRecord?.id,
-      });
+      try {
+        await supabase.from('leads').insert({
+          // user_id omitted — phone_call leads are ownerless until claimed
+          name: structured?.caller_name || 'Phone Inquiry',
+          phone: structured?.callback_number || call?.customer?.number,
+          address: structured?.address,
+          service_type: structured?.service_needed || 'roofing',
+          source: 'phone_call',
+          raw_lead_text: transcript,
+          notes: structured?.issue_description,
+          urgency: urgencyToScore(structured?.urgency),
+          stage: 'new',
+          call_id: callRecord?.id,
+        });
+      } catch (leadErr) {
+        // Non-fatal: call saved successfully, lead creation failed
+        // Likely cause: user_id NOT NULL constraint not patched yet
+        console.error('Vapi lead insert error (non-fatal):', leadErr);
+      }
     }
 
     // 3. Return success

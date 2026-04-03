@@ -11,6 +11,7 @@ import BusinessNamer from './components/BusinessNamer';
 import Pipeline from './components/Pipeline';
 import Calls from './components/Calls';
 import Auth from './components/Auth';
+import AdminPanel from './components/AdminPanel';
 import { Tab } from './types';
 
 const App: React.FC = () => {
@@ -36,6 +37,7 @@ const App: React.FC = () => {
     { id: Tab.MARKETING_COPY, label: 'Marketing Copy' },
     { id: Tab.NAME_IDEAS, label: 'Name Ideas' },
     { id: Tab.CHAT, label: 'AI Chat' },
+    { id: Tab.ADMIN, label: '⚙️ Admin' },
   ], []);
 
   const renderContent = () => {
@@ -48,6 +50,7 @@ const App: React.FC = () => {
       case Tab.BUSINESS_PLANNER: return <BusinessPlanner />;
       case Tab.CHAT: return <ChatBot />;
       case Tab.NAME_IDEAS: return <BusinessNamer />;
+      case Tab.ADMIN: return <AdminPanel />;
       default: return <LeadFinder />;
     }
   };

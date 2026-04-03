@@ -7,6 +7,7 @@ export enum Tab {
   BUSINESS_PLANNER = 'business-planner',
   CHAT = 'chat',
   NAME_IDEAS = 'name-ideas',
+  ADMIN = 'admin',
 }
 
 export interface ChatMessage {

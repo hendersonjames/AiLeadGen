@@ -21,6 +21,19 @@ const App: React.FC = () => {
 
   // Listen to auth state
   useEffect(() => {
+    // Handle OAuth callback — exchange auth code for session (Google OAuth redirect)
+    const exchangeCode = async () => {
+      const code = new URLSearchParams(window.location.search).get('code');
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) {
+          // Clean the URL so the code doesn't persist
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      }
+    };
+    exchangeCode();
+
     const { data: { subscription } } = onAuthStateChange((currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);

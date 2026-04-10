@@ -238,3 +238,17 @@ alter table public.leads alter column user_id drop not null;
 -- Patch 2: Add update policy for calls table so users can update status
 create policy if not exists "Users can update their own calls"
   on public.calls for update using (auth.uid() = user_id);
+
+-- ================================================================
+-- SCHEMA PATCH v2 — Vapi webhook enhanced metadata
+-- Run in Supabase SQL Editor → New Query
+-- ================================================================
+
+-- Add call_type (inbound/outbound) and ended_reason (hangup reason)
+-- to the calls table so the webhook can save richer call metadata.
+alter table public.calls
+  add column if not exists call_type text
+    check (call_type in ('inbound', 'outbound'));
+
+alter table public.calls
+  add column if not exists ended_reason text;

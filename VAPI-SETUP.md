@@ -56,6 +56,23 @@ In Supabase SQL Editor, run the calls table portion of `supabase-schema.sql` (th
 
 ## Step 5 — Test It
 
+**First, verify the webhook is reachable:**
+```bash
+# In your terminal, trigger a test POST to the webhook:
+curl -X POST https://ai-lead-gen-one.vercel.app/api/vapi-webhook \
+  -H "Content-Type: application/json" \
+  -d '{"message":{"type":"status-update"}}'
+```
+Expected: `{"received":true}` — confirms the endpoint is up and env vars are loaded.
+
+**Check the health endpoint** (shows missing env vars):
+```
+https://ai-lead-gen-one.vercel.app/api/health
+```
+- If `supabase_connection` ≠ `OK`, the webhook won't work — fix env vars first.
+- If `leads_table` says "may need patch", run the SQL migration in Step 4.
+
+**Test a real call:**
 1. Call the phone number you set up
 2. The AI should answer with your business name
 3. After the call ends, check the **📞 Calls** tab in LeadHub — the call should appear automatically

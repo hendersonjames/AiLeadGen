@@ -8,35 +8,108 @@ if (!process.env.API_KEY) {
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 let chatInstance: Chat | null = null;
 
-// HOMEOWNER LEAD FINDER — finds potential customers for a contractor (not other contractors)
-export const findLeads = async (serviceType: string, location: string, userCoords?: { latitude: number; longitude: number }): Promise<GenerateContentResponse> => {
-  const prompt = `You are a lead generation expert helping a ${serviceType} contractor find new residential and commercial customers in ${location}.
+// Structured lead type matching what we save to the database
+export interface StructuredLead {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip?: string;
+  phone?: string;
+  email?: string;
+  source: string;
+  source_url?: string;
+  opportunity_type: string; // storm_damage | permit_activity | new_construction | aging_home | etc
+  urgency: 'high' | 'medium' | 'low';
+  why_lead: string; // why this is a real, actionable lead
+  suggested_action: string;
+  data_freshness: string; // "found today", "reported 3 days ago", etc
+  estimated_value?: number;
+}
 
-Your goal is to find HOMEOWNERS and BUSINESSES that likely need ${serviceType} services — NOT other contractors.
+// HOMEOWNER LEAD FINDER — finds verified, fresh leads for contractors
+export const findLeads = async (
+  serviceType: string,
+  location: string,
+  userCoords?: { latitude: number; longitude: number }
+): Promise<StructuredLead[]> => {
+  const prompt = `You are a lead generation expert helping a ${serviceType} contractor find NEW residential and commercial customers in ${location}.
 
-Search for the following signals in the ${location} area:
-1. **Recent storm, hail, wind, or weather damage** — news reports, community alerts, insurance claims spikes
-2. **Neighborhoods with aging housing stock** — homes 15–30+ years old that likely need ${serviceType} work
-3. **Recent real estate activity** — newly sold or newly listed homes (new owners often need inspections/work)
-4. **Local permit activity** — renovation or construction permits that commonly pair with ${serviceType}
-5. **Community discussions** — local Facebook groups, Nextdoor posts, or forums where residents mention needing ${serviceType}
-6. **Commercial properties** — businesses, apartment complexes, or HOAs that may need ${serviceType} services
+IMPORTANT RULES:
+- Find HOMEOWNERS and BUSINESSES that need ${serviceType} services — NOT other contractors, not generic neighborhoods
+- Every lead MUST have a real street address and a reason this is a fresh, verified opportunity
+- Include recency signals — if something happened in the last 30 days, note it
+- If you cannot verify an address exists, mark urgency as "low" or omit the lead
 
-For each opportunity found, provide:
-- **Area/Neighborhood** — specific location
-- **Opportunity Type** — what signal was found (storm damage, new homeowner, etc.)
-- **Why It's a Lead** — brief explanation
-- **Urgency** — High / Medium / Low
-- **Suggested First Step** — how the contractor should approach this lead
+Search for these high-quality signals:
 
-Format as a clear, actionable list. Focus on real, specific opportunities in ${location} — not generic advice.`;
+1. **Storm/Hail/Wind Damage (HIGHEST VALUE)**
+   - Look for: recent storm reports in ${location}, insurance claim spikes, neighborhood damage visible on satellite imagery, local news articles about storm damage from the past 2-4 weeks
+   - Every lead needs: specific address, description of damage, recency of event
+
+2. **Building Permit Activity**
+   - Look for: renovation, roof replacement, HVAC, electrical permits pulled in the last 60 days in ${location}
+   - Check city permit portals for ${location}
+   - Every lead needs: specific address, permit type, date pulled
+
+3. **New Construction/Recent Sales**
+   - Look for: homes sold in last 90 days in ${location} (new homeowners = high remodeling intent)
+   - Every lead needs: address, sale date (within 90 days), approximate home age
+
+4. **Aging Housing Stock (roofing/heating focus)**
+   - Look for: neighborhoods with homes 20-40 years old in ${location}, homes that haven't had recent work
+   - Every lead needs: approximate neighborhood, why this area specifically needs ${serviceType} work
+
+5. **Local Business Activity**
+   - Look for: commercial properties, apartment complexes, HOAs in ${location} with visible wear or recent expansion
+
+For each lead found, return a JSON object with this exact structure:
+{
+  "name": "Homeowner Name or Business Name",
+  "address": "123 Main St",
+  "city": "Denver",
+  "state": "CO",
+  "zip": "80203",
+  "phone": "720-555-1234",
+  "email": "",
+  "source": "Denver 9News storm report | City permit portal | Redfin listing",
+  "source_url": "https://...",
+  "opportunity_type": "storm_damage | permit_activity | new_construction | aging_home | commercial",
+  "urgency": "high | medium | low",
+  "why_lead": "1-2 sentence explanation of WHY this is a real, verified lead right now",
+  "suggested_action": "Specific first step — e.g., 'Knock on door and offer free inspection after hailstorm'",
+  "data_freshness": "Reported 3 days ago | Permit pulled 2 weeks ago | Sold 45 days ago",
+  "estimated_value": 8500
+}
+
+Return EXACTLY 5-10 leads as a JSON array. Do not wrap in markdown code blocks. Do not add preamble text. Return only the JSON array.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
     config: { tools: [{ googleSearch: {} }] },
   });
-  return response;
+
+  const text = response.text.trim();
+
+  // Strip markdown code blocks if present
+  let jsonStr = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+
+  try {
+    const leads = JSON.parse(jsonStr);
+    if (Array.isArray(leads)) {
+      return leads.slice(0, 10); // cap at 10 leads per search
+    }
+    // If it's an object with a leads array, extract it
+    if (leads.leads && Array.isArray(leads.leads)) {
+      return leads.leads.slice(0, 10);
+    }
+    console.warn('Unexpected JSON structure from gemini:', text.slice(0, 200));
+    return [];
+  } catch (e) {
+    console.error('Failed to parse leads JSON:', e, '\nResponse:', text.slice(0, 500));
+    return [];
+  }
 };
 
 // CONTRACTOR FINDER — for admin use only, finds contractors to sell LeadHub to
